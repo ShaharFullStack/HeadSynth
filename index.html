@@ -1,146 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HeadSynth - Head-Controlled Music Synthesizer</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link rel="stylesheet" href="src/css/styles.css">
+  <title>HeadSynth - Head Controlled Synthesizer</title>
+  <link rel="stylesheet" href="src/css/modern-styles.css">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- MediaPipe -->
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/face_mesh.js" crossorigin="anonymous"></script>  <!-- Tone.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <!-- Tone.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 </head>
-<body class="theme-dark">
-  <div class="language-toggle">
-    <button id="languageToggle" aria-label="Toggle Language">
-      <span id="languageIcon">EN</span>
-    </button>
-  </div>
-
+<body>
   <div class="container">
     <header>
-      <h1 class="app-title">
-        <span class="neon-text">HeadSynth</span>
-        <span class="subtitle" data-i18n="subtitle">Head-Controlled Music Synthesizer</span>
-      </h1>
-      
-      <div class="main-controls">
-        <button id="startBtn" class="btn btn-primary pulse-animation" data-i18n="startBtn">
-          <i class="fas fa-play"></i> <span>Start</span>
-        </button>
-        <button id="calibrateBtn" class="btn btn-secondary" data-i18n="calibrateBtn">
-          <i class="fas fa-crosshairs"></i> <span>Calibrate</span>
-        </button>
-        <button id="cameraBtn" class="btn btn-info" data-i18n="cameraBtn">
-          <i class="fas fa-video"></i> <span>Enable Camera</span>
-        </button>
-        <button id="helpBtn" class="btn btn-info" data-i18n="helpBtn">
-          <i class="fas fa-question-circle"></i> <span>Help</span>
-        </button>
+      <h1 class="app-title" data-i18n="appTitle">HeadSynth - Head Controlled Synthesizer</h1>
+      <div class="controls">
+        <div class="control-group">
+          <h3 class="control-group-title" data-i18n="camera">Camera</h3>
+          <button id="startBtn" class="btn btn-primary">
+            <i class="fas fa-video"></i>
+            <span data-i18n="startCamera">Start Camera</span>
+          </button>
+          <button id="calibrateBtn" class="btn">
+            <i class="fas fa-sliders"></i>
+            <span data-i18n="calibrateCamera">Calibrate Camera</span>
+          </button>
+        </div>
+        
+        <div class="control-group">
+          <h3 class="control-group-title" data-i18n="instrument">Instrument</h3>
+          <select id="instrumentSelect" class="selector">
+            <option value="synth" data-i18n="basicSynth">Basic Synthesizer</option>
+            <option value="amSynth" data-i18n="amSynth">AM Synth</option>
+            <option value="fmSynth" data-i18n="fmSynth">FM Synth</option>
+            <option value="pluck" data-i18n="pluck">Pluck</option>
+            <option value="piano" data-i18n="piano">Piano</option>
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <h3 class="control-group-title" data-i18n="scale">Scale</h3>
+          <select id="scaleSelect" class="selector">
+            <option value="major" data-i18n="majorScale">Major Scale</option>
+            <option value="minor" data-i18n="minorScale">Minor Scale</option>
+            <option value="pentatonic" data-i18n="pentatonicScale">Pentatonic</option>
+            <option value="blues" data-i18n="bluesScale">Blues</option>
+            <option value="chromatic" data-i18n="chromaticScale">Chromatic</option>
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <h3 class="control-group-title" data-i18n="controls">Controls</h3>
+          <div class="slider-container">
+            <label for="volumeSlider" data-i18n="volume">Volume</label>
+            <input type="range" id="volumeSlider" class="slider" min="0" max="1" step="0.01" value="0.5">
+          </div>
+          <div class="slider-container">
+            <label for="reverbSlider" data-i18n="reverb">Reverb Effect</label>
+            <input type="range" id="reverbSlider" class="slider" min="0" max="1" step="0.01" value="0.3">
+          </div>
+        </div>
+        
+        <div class="control-group">
+          <h3 class="control-group-title" data-i18n="languageSelector">Language</h3>
+          <select id="languageSelect" class="selector">
+            <option value="en" data-i18n="english">English</option>
+            <option value="he" data-i18n="hebrew">עברית</option>
+          </select>
+        </div>
       </div>
     </header>
     
     <main>
-      <div class="flex-container">
-        <div class="camera-module">
-          <div class="camera-container">
-            <video id="webcam" autoplay playsinline muted></video>
-            <canvas id="output-canvas"></canvas>
-            <div id="head-position-indicator" class="position-indicator"></div>
-            <div id="camera-placeholder" class="camera-placeholder">
-              <i class="fas fa-video fa-3x"></i>
-              <p data-i18n="clickToActivate">Click to activate camera</p>
-              <button class="btn btn-primary camera-activate-btn" data-i18n="activateCamera">Activate Camera</button>
-            </div>
-            <div class="tracking-status">
-              <span id="trackingStatusText" data-i18n="trackingInactive">Tracking Inactive</span>
-              <div id="trackingStatusIndicator" class="status-indicator"></div>
-            </div>
-          </div>
-          
-          <div class="head-position-display">
-            <div class="position-text">
-              <span id="head-position" data-i18n="headPosition">Head Position: X: 0.00, Y: 0.00, Z: 0.00</span>
-            </div>
-            <div class="sensitivity-control">
-              <span data-i18n="sensitivity">Sensitivity</span>
-              <input type="range" id="sensitivitySlider" min="0.5" max="2" step="0.1" value="1">
-            </div>
-          </div>
-        </div>
-        
-        <div class="synth-controls">
-          <div class="control-group">
-            <label for="instrumentSelect" data-i18n="instrument">Instrument</label>
-            <select id="instrumentSelect" class="selector">
-              <option value="synth" data-i18n="basicSynth">Basic Synthesizer</option>
-              <option value="amSynth" data-i18n="amSynth">AM Synth</option>
-              <option value="fmSynth" data-i18n="fmSynth">FM Synth</option>
-              <option value="pluck" data-i18n="pluck">Pluck</option>
-              <option value="piano" data-i18n="piano">Piano</option>
-            </select>
-          </div>
-          
-          <div class="control-group">
-            <label for="scaleSelect" data-i18n="scale">Scale</label>
-            <select id="scaleSelect" class="selector">
-              <option value="major" data-i18n="majorScale">Major Scale</option>
-              <option value="minor" data-i18n="minorScale">Minor Scale</option>
-              <option value="pentatonic" data-i18n="pentatonicScale">Pentatonic</option>
-              <option value="blues" data-i18n="bluesScale">Blues</option>
-              <option value="chromatic" data-i18n="chromaticScale">Chromatic</option>
-            </select>
-          </div>
-          
-          <div class="control-group slider-group">
-            <label for="volumeSlider" data-i18n="volume">Volume</label>
-            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5" class="slider">
-            <div class="slider-value" id="volumeValue">50%</div>
-          </div>
-          
-          <div class="control-group slider-group">
-            <label for="reverbSlider" data-i18n="reverb">Reverb</label>
-            <input type="range" id="reverbSlider" min="0" max="1" step="0.01" value="0.3" class="slider">
-            <div class="slider-value" id="reverbValue">30%</div>
-          </div>
-          
-          <div class="control-group slider-group">
-            <label for="delaySlider" data-i18n="delay">Delay</label>
-            <input type="range" id="delaySlider" min="0" max="1" step="0.01" value="0.2" class="slider">
-            <div class="slider-value" id="delayValue">20%</div>
-          </div>
-          
-          <div class="status-panel">
-            <div id="current-note" class="status-item" data-i18n="currentNote">Note: --</div>
-            <div id="mode-display" class="status-item" data-i18n="modeDisplay">Mode: Paused</div>
-          </div>
-        </div>
+      <div class="camera-container">
+        <div id="camera-status" data-i18n="cameraInstructions">Click 'Start Camera' to begin</div>
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="output-canvas"></canvas>
+        <div id="head-position-indicator"></div>
       </div>
       
-      <div class="notes-visualization">
+      <div class="synth-interface">
         <div class="notes-grid" id="notesGrid"></div>
+        <div class="status-panel">
+          <div id="current-note" class="status-item">
+            <div class="status-label" data-i18n="note">Note</div>
+            <div class="status-value">--</div>
+          </div>
+          <div id="mode-display" class="status-item">
+            <div class="status-label" data-i18n="mode">Mode</div>
+            <div class="status-value" data-i18n="paused">Paused</div>
+          </div>
+          <div id="head-position" class="status-item">
+            <div class="status-label" data-i18n="headPosition">Head Position</div>
+            <div class="status-value">X: 0, Y: 0, Z: 0</div>
+          </div>
+        </div>
       </div>
       
       <div class="loop-section">
-        <div class="section-header">
-          <h2 data-i18n="looper">Looper</h2>
-          <div class="loop-controls">
-            <button id="recordLoopBtn" class="btn btn-danger" data-i18n="recordLoop">
-              <i class="fas fa-circle"></i> <span>Record Loop</span>
-            </button>
-            <button id="playLoopBtn" class="btn btn-success" data-i18n="playLoop">
-              <i class="fas fa-play"></i> <span>Play Loop</span>
-            </button>
-            <button id="stopLoopBtn" class="btn btn-warning" data-i18n="stopLoop">
-              <i class="fas fa-stop"></i> <span>Stop Loop</span>
-            </button>
-            <button id="clearLoopBtn" class="btn btn-info" data-i18n="clearLoop">
-              <i class="fas fa-trash"></i> <span>Clear Loop</span>
-            </button>
-          </div>
+        <h3 class="section-title">
+          <i class="fas fa-repeat"></i>
+          <span data-i18n="looper">Looper</span>
+        </h3>
+        <div class="loop-controls">
+          <button id="recordLoopBtn" class="btn">
+            <i class="fas fa-circle"></i>
+            <span data-i18n="recordLoop">Record Loop</span>
+          </button>
+          <button id="playLoopBtn" class="btn">
+            <i class="fas fa-play"></i>
+            <span data-i18n="playLoop">Play Loop</span>
+          </button>
+          <button id="stopLoopBtn" class="btn">
+            <i class="fas fa-stop"></i>
+            <span data-i18n="stopLoop">Stop Loop</span>
+          </button>
+          <button id="clearLoopBtn" class="btn">
+            <i class="fas fa-trash"></i>
+            <span data-i18n="clearLoop">Clear Loop</span>
+          </button>
         </div>
         <div id="loopTracks" class="loop-tracks">
           <!-- Loop tracks will be added here -->
@@ -151,191 +134,99 @@
     <!-- Calibration Modal -->
     <div class="modal" id="calibrationModal">
       <div class="modal-content">
-        <div class="modal-header">
-          <h2 data-i18n="calibrationTitle">System Calibration</h2>
-          <button class="close-btn" id="cancelCalibrationBtn" aria-label="Close">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <p data-i18n="calibrationInstructions">Please look straight at the camera and follow these movements:</p>
-          
-          <div class="calibration-animation" id="calibrationAnimation">
-            <div class="head-model">
-              <div class="face"></div>
-              <div class="direction-indicator" id="directionIndicator"></div>
-            </div>
-          </div>
-          
-          <ol id="calibrationSteps">
-            <li class="current-step" data-i18n="calibStep1">Look up and down</li>
-            <li data-i18n="calibStep2">Look left and right</li>
-            <li data-i18n="calibStep3">Tilt your head to both sides</li>
-          </ol>
-          
-          <div class="progress-container">
-            <div class="progress-bar" id="calibrationProgress"></div>
-          </div>
-          
-          <div id="calibrationStatus" class="calibration-status" data-i18n="startingCalibration">Starting calibration...</div>
-        </div>
-        <div class="modal-footer">
-          <button id="skipCalibrationBtn" class="btn btn-secondary" data-i18n="skipCalibration">
-            Use Default Settings
-          </button>
-          <button id="completeCalibrationBtn" class="btn btn-primary" data-i18n="completeCalibration" disabled>
-            Complete
-          </button>
-        </div>
+        <h2 class="modal-title">
+          <i class="fas fa-sliders"></i>
+          <span data-i18n="systemCalibration">System Calibration</span>
+        </h2>
+        <p data-i18n="calibrationInstructions">Please look directly at the camera and perform the following movements:</p>
+        <ol id="calibrationSteps">
+          <li class="current-step" data-i18n="nodUpDown">Nod your head up and down</li>
+          <li data-i18n="moveLeftRight">Move your head left and right</li>
+          <li data-i18n="tiltHead">Tilt your head to both sides</li>
+        </ol>
+        <div id="calibrationStatus" data-i18n="startingCalibration">Starting calibration...</div>
+        <button id="cancelCalibrationBtn" class="btn btn-danger">
+          <i class="fas fa-times"></i>
+          <span data-i18n="cancel">Cancel</span>
+        </button>
       </div>
     </div>
     
     <!-- Help Modal -->
     <div class="modal" id="helpModal">
       <div class="modal-content">
-        <div class="modal-header">
-          <h2 data-i18n="helpTitle">How to Use HeadSynth</h2>
-          <button class="close-btn" id="closeHelpBtn" aria-label="Close">
-            <i class="fas fa-times"></i>
-          </button>
+        <h2 class="modal-title">
+          <i class="fas fa-question-circle"></i>
+          <span data-i18n="instructions">Instructions</span>
+        </h2>
+        <p data-i18n="welcomeMessage">Welcome to HeadSynth - a synthesizer controlled by head movements!</p>
+        
+        <div class="modal-section">
+          <h3 class="modal-section-title">
+            <i class="fas fa-info-circle"></i>
+            <span data-i18n="howToUse">How to Use:</span>
+          </h3>
+          <ol>
+            <li data-i18n="activateCamera">Activate Camera: Click the 'Start Camera' button to begin.</li>
+            <li data-i18n="allowCameraAccess">Allow Access: When prompted, allow camera access in your browser.</li>
+            <li data-i18n="calibrateTip">Calibration: Click 'Calibrate Camera' and follow the instructions.</li>
+            <li>
+              <span data-i18n="useHeadMovements">Use Head Movements: Control sounds with your head:</span>
+              <ul>
+                <li data-i18n="movementLeftRight">Moving head left/right: Select notes</li>
+                <li data-i18n="movementUpDown">Moving head up/down: Control volume</li>
+                <li data-i18n="movementTilt">Tilting head: Control effects</li>
+              </ul>
+            </li>
+          </ol>
         </div>
-        <div class="modal-body">
-          <p data-i18n="helpIntro">Welcome to HeadSynth - a musical instrument you can play with head movements!</p>
-          
-          <div class="help-section">
-            <h3 data-i18n="gettingStarted">Getting Started</h3>
-            <ol>
-              <li data-i18n="helpStep1">Click "Enable Camera" to turn on your webcam.</li>
-              <li data-i18n="helpStep2">Click "Calibrate" and follow the instructions to set up head tracking.</li>
-              <li data-i18n="helpStep3">Click "Start" to begin making music.</li>
-              <li data-i18n="helpStep4">Use head movements to control sounds:</li>
-            </ol>
-            
-            <div class="movement-guide">
-              <div class="movement-item">
-                <div class="movement-icon">
-                  <i class="fas fa-arrows-left-right"></i>
-                </div>
-                <div class="movement-description" data-i18n="leftRightDesc">
-                  Moving your head left/right selects different notes
-                </div>
-              </div>
-              
-              <div class="movement-item">
-                <div class="movement-icon">
-                  <i class="fas fa-arrows-up-down"></i>
-                </div>
-                <div class="movement-description" data-i18n="upDownDesc">
-                  Moving your head up/down controls volume and intensity
-                </div>
-              </div>
-              
-              <div class="movement-item">
-                <div class="movement-icon">
-                  <i class="fas fa-rotate"></i>
-                </div>
-                <div class="movement-description" data-i18n="tiltDesc">
-                  Tilting your head controls effects
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="help-section">
-            <h3 data-i18n="troubleshooting">Troubleshooting</h3>
-            <ul>
-              <li data-i18n="cameraNotWorking">If the camera doesn't activate, check your browser permissions</li>
-              <li data-i18n="tryDifferentBrowser">Try a different browser if you continue having issues</li>
-              <li data-i18n="ensureGoodLighting">Ensure you have good lighting for better face tracking</li>
-            </ul>
-          </div>
-          
-          <div class="help-section">
-            <h3 data-i18n="accessibilityOptions">Accessibility Options</h3>
-            <p data-i18n="sensitivityDesc">Use the sensitivity slider to adjust how much head movement is needed to control the instrument.</p>
-            <p data-i18n="assistiveTechDesc">HeadSynth works with screen readers and other assistive technology.</p>
-          </div>
-          
-          <div class="help-section">
-            <h3 data-i18n="keyboardShortcuts">Keyboard Shortcuts</h3>
-            <div class="shortcuts-grid">
-              <div class="shortcut-item">
-                <span class="key">Space</span>
-                <span data-i18n="shortcutStart">Start/Stop</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">C</span>
-                <span data-i18n="shortcutCalibrate">Calibrate</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">V</span>
-                <span data-i18n="shortcutCamera">Toggle Camera</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">R</span>
-                <span data-i18n="shortcutRecord">Record Loop</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">P</span>
-                <span data-i18n="shortcutPlay">Play Loop</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">S</span>
-                <span data-i18n="shortcutStop">Stop Loop</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">L</span>
-                <span data-i18n="shortcutLanguage">Change Language</span>
-              </div>
-              <div class="shortcut-item">
-                <span class="key">+/-</span>
-                <span data-i18n="shortcutVolume">Change Volume</span>
-              </div>
-            </div>
-          </div>
+        
+        <div class="troubleshooting">
+          <h3 class="modal-section-title">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span data-i18n="troubleshooting">Troubleshooting</span>
+          </h3>
+          <ul>
+            <li data-i18n="cameraNotActivating">If the camera doesn't activate, ensure your computer has a connected camera and it's not being used by another application.</li>
+            <li data-i18n="noCameraPermission">If your browser doesn't request camera access, check your browser's security settings.</li>
+            <li data-i18n="cantSeeYourself">If you can't see yourself in the camera, try refreshing the page and clicking 'Start Camera' again.</li>
+          </ul>
         </div>
+        
+        <button id="closeHelpBtn" class="btn">
+          <i class="fas fa-check"></i>
+          <span data-i18n="close">Close</span>
+        </button>
       </div>
     </div>
     
     <!-- Error Modal -->
     <div class="modal" id="errorModal">
       <div class="modal-content">
-        <div class="modal-header">
-          <h2 data-i18n="errorTitle">Error</h2>
-          <button class="close-btn" id="closeErrorBtn" aria-label="Close">
-            <i class="fas fa-times"></i>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="error-icon">
-            <i class="fas fa-exclamation-triangle"></i>
-          </div>
-          <p id="errorMessage"></p>
-        </div>
-        <div class="modal-footer">
-          <button id="dismissErrorBtn" class="btn btn-primary" data-i18n="dismiss">Dismiss</button>
-        </div>
+        <h2 class="modal-title">
+          <i class="fas fa-exclamation-circle"></i>
+          <span data-i18n="error">Error</span>
+        </h2>
+        <p id="errorMessage"></p>
+        <button id="closeErrorBtn" class="btn">
+          <i class="fas fa-times"></i>
+          <span data-i18n="close">Close</span>
+        </button>
       </div>
     </div>
     
     <footer>
-      <div class="theme-toggle">
-        <button id="themeToggleBtn" aria-label="Toggle Dark/Light Theme">
-          <i class="fas fa-moon"></i>
-        </button>
-      </div>
-      <p class="credits">
-        <span data-i18n="developedBy">Developed by Shahar Maoz</span>
-        <span class="version">v2.0</span>
+      <button id="helpBtn" class="btn btn-secondary">
+        <i class="fas fa-question-circle"></i>
+        <span data-i18n="help">Help</span>
+      </button>
+      <p>
+        <span data-i18n="developedBy">Developed by</span> Shahar Maoz
       </p>
     </footer>
   </div>
 
-  <!-- Toast notifications container -->
-  <div id="toastContainer" class="toast-container"></div>
-
-  <!-- Scripts -->
-  <script src="src/js/i18n.js" type="module"></script>
+  <!-- Main application script -->
   <script src="main.js" type="module"></script>
 </body>
 </html>
