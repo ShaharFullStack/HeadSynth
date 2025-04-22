@@ -329,7 +329,7 @@ main {
   padding: 8px 12px;
   background-color: rgba(0, 0, 0, 0.5);
   border-radius: var(--border-radius-md);
-  color: white;
+  color: rgb(240, 9, 9);
   font-size: 0.8rem;
 }
 
